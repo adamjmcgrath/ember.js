@@ -240,6 +240,12 @@ export default class Environment extends GlimmerEnvironment {
     let blockMeta = symbolTable.getMeta();
     let owner = blockMeta.owner;
     let source = blockMeta.moduleName && `template:${blockMeta.moduleName}`;
+    let { component: ComponentClass, layout } = lookupComponent(owner, name, { source });
+    let cacheable = !!owner.__container__.factoryCache[`component:${name}`];
+
+    if (!cacheable && (ComponentClass || layout)) {
+      return new CurlyComponentDefinition(name, ComponentClass, layout);
+    }
 
     return this._definitionCache.get({ name, source, owner });
   }
